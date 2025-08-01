@@ -518,7 +518,9 @@
                 ]);
                 modalImage.src = imageUrl;
                 modalImage.classList.remove('hidden');
-                modalText.innerHTML = textDescription;
+                // This line is the fix: it cleans up the AI's response.
+                const cleanedDescription = textDescription.replace(/```html|```/g, "").trim();
+                modalText.innerHTML = cleanedDescription;
             } catch (error) {
                 console.error("AI generation failed:", error);
                 modalText.innerHTML = `<p class="text-red-500"><strong>Sorry, the AI concept could not be generated.</strong><br>${error.message}</p>`;
@@ -541,7 +543,8 @@
             const prompt = `Act as a helpful assistant. A potential customer is contacting a kitchen remodeling company. Their project keywords are: "${keywords}". Write a friendly, clear, and concise message (about 3-4 sentences) for them to send. The message should briefly introduce their project and ask for a consultation.`;
             try {
                 const aiResponse = await generateText(prompt);
-                messageTextarea.value = aiResponse.replace(/<p>|<\/p>/g, "");
+                const cleanedResponse = aiResponse.replace(/```html|```/g, "").trim();
+                messageTextarea.value = cleanedResponse.replace(/<p>|<\/p>/g, "");
             } catch (error) {
                 console.error("AI draft failed:", error);
                 messageTextarea.value = originalText;
@@ -550,6 +553,7 @@
                 keywordsInput.value = '';
             }
         });
+
 
         // --- Image Carousel Logic ---
         const prevBtn = document.getElementById('prev-btn');
