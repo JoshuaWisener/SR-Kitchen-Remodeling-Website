@@ -457,35 +457,46 @@
         const closeModal = () => aiModal.classList.add('hidden');
         closeModalBtn.addEventListener('click', closeModal);
 
-        // This new function calls your secure Netlify function
-        async function getAiContent(prompt, type) {
-            const response = await fetch('/.netlify/functions/generate-ai-content', {
+        async function makeApiCall(url, payload) {
+            const apiKey = ""; // Handled by the execution environment
+            const fullUrl = `${url}?key=${apiKey}`;
+            const response = await fetch(fullUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt, type }),
+                body: JSON.stringify(payload)
             });
-
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`AI service failed: ${errorText}`);
+                const errorBody = await response.text();
+                console.error(`API Error (${response.status}):`, errorBody);
+                throw new Error(`The AI service failed. Status: ${response.status}. Please try again later.`);
             }
-
-            const data = await response.json();
-
-            if (type === 'text') {
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) throw new Error("Could not parse a valid response from the AI text service.");
-                return text;
-            }
-
-            if (type === 'image') {
-                const imageBytes = data.predictions?.[0]?.bytesBase64Encoded;
-                if (!imageBytes) throw new Error("Could not parse a valid response from the AI image service.");
-                return `data:image/png;base64,${imageBytes}`;
-            }
+            return response.json();
         }
 
-        // Update the event listeners to use the new function
+        async function generateText(prompt) {
+            const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const data = await makeApiCall(url, payload);
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) {
+                console.error("Invalid response structure from Text API:", data);
+                throw new Error("Could not parse a valid response from the AI text service.");
+            }
+            return text;
+        }
+
+        async function generateImage(prompt) {
+            const url = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict';
+            const payload = { instances: [{ prompt: prompt }], parameters: { "sampleCount": 1 } };
+            const data = await makeApiCall(url, payload);
+            const imageBytes = data.predictions?.[0]?.bytesBase64Encoded;
+            if (!imageBytes) {
+                console.error("Invalid response structure from Image API:", data);
+                throw new Error("Could not parse a valid response from the AI image service.");
+            }
+            return `data:image/png;base64,${imageBytes}`;
+        }
+
         generateIdeasBtn.addEventListener('click', async () => {
             const styleInput = document.getElementById('style-input');
             const style = styleInput.value.trim();
@@ -493,26 +504,21 @@
                 alert("Please enter a kitchen style to get ideas.");
                 return;
             }
-
             modalTitle.textContent = `AI Ideas for a ${style} Kitchen`;
             modalSpinner.style.display = 'flex';
             modalImage.classList.add('hidden');
             modalText.innerHTML = '';
             openModal();
-
             const imagePrompt = `An ultra-realistic, photorealistic photograph of a high-end kitchen with a "${style}" theme, presented in a 16:9 aspect ratio. The image should look like a professional shot for an architectural digest magazine, showcasing custom cabinetry, a stylish island, and beautiful, natural lighting.`;
             const textPrompt = `Act as a creative kitchen designer. Generate an inspiring and descriptive paragraph (about 150 words) for a kitchen remodeling concept with a "${style}" theme. Focus on materials, color palette, key features, and overall mood. Format the response using HTML paragraphs.`;
-
             try {
                 const [imageUrl, textDescription] = await Promise.all([
-                    getAiContent(imagePrompt, 'image'),
-                    getAiContent(textPrompt, 'text')
+                    generateImage(imagePrompt),
+                    generateText(textPrompt)
                 ]);
-
                 modalImage.src = imageUrl;
                 modalImage.classList.remove('hidden');
                 modalText.innerHTML = textDescription;
-
             } catch (error) {
                 console.error("AI generation failed:", error);
                 modalText.innerHTML = `<p class="text-red-500"><strong>Sorry, the AI concept could not be generated.</strong><br>${error.message}</p>`;
@@ -529,15 +535,12 @@
                 alert("Please enter some keywords about your project.");
                 return;
             }
-        
             const messageTextarea = document.getElementById('message');
             const originalText = messageTextarea.value;
             messageTextarea.value = "Drafting with AI...";
-        
             const prompt = `Act as a helpful assistant. A potential customer is contacting a kitchen remodeling company. Their project keywords are: "${keywords}". Write a friendly, clear, and concise message (about 3-4 sentences) for them to send. The message should briefly introduce their project and ask for a consultation.`;
-        
             try {
-                const aiResponse = await getAiContent(prompt, 'text');
+                const aiResponse = await generateText(prompt);
                 messageTextarea.value = aiResponse.replace(/<p>|<\/p>/g, "");
             } catch (error) {
                 console.error("AI draft failed:", error);
@@ -547,7 +550,6 @@
                 keywordsInput.value = '';
             }
         });
-
 
         // --- Image Carousel Logic ---
         const prevBtn = document.getElementById('prev-btn');
