@@ -325,6 +325,20 @@
                             <input type="email" id="email" name="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div class="mb-4">
+                            <label for="contact-method" class="block text-sm font-bold mb-2">Preferred Contact Method <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <select id="contact-method" name="contact-method" class="appearance-none w-full bg-white px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    <option value="" disabled selected>Please select an option</option>
+                                    <option value="Call">Call</option>
+                                    <option value="Text">Text</option>
+                                    <option value="Email">Email</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
                             <label for="message" class="block text-sm font-bold mb-2">Message <span class="text-red-500">*</span></label>
                             <textarea id="message" name="message" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tell us about your kitchen remodeling project..." required></textarea>
                         </div>
@@ -429,7 +443,8 @@
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
             const message = document.getElementById('message').value;
-            if (name && phone && message) {
+            const contactMethod = document.getElementById('contact-method').value;
+            if (name && phone && message && contactMethod) {
                 formMessage.textContent = 'Thank you for your message! We will get back to you soon.';
                 formMessage.className = 'mb-4 p-3 rounded-md bg-green-100 text-green-800';
                 formMessage.classList.remove('hidden');
