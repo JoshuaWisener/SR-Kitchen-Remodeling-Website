@@ -39,6 +39,10 @@
         section[id] {
             scroll-margin-top: 120px;
         }
+        /* Style for the placeholder option in the dropdown */
+        select.placeholder-gray {
+            color: #9ca3af;
+        }
     </style>
 
     <!-- SEO: JSON-LD Schema for Local Business -->
@@ -588,6 +592,22 @@
         nextBtn.addEventListener('click', () => {
             currentSlide = (currentSlide < carouselItems.length - 1) ? currentSlide + 1 : 0;
             showSlide(currentSlide);
+        });
+        
+        // --- Dropdown Placeholder Color Logic ---
+        const contactMethodSelect = document.getElementById('contact-method');
+        
+        // Set initial color
+        if (contactMethodSelect.value === "") {
+            contactMethodSelect.classList.add('placeholder-gray');
+        }
+
+        contactMethodSelect.addEventListener('change', (e) => {
+            if (e.target.value === "") {
+                e.target.classList.add('placeholder-gray');
+            } else {
+                e.target.classList.remove('placeholder-gray');
+            }
         });
         
         // --- Privacy Policy Modal Logic ---
