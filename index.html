@@ -500,19 +500,21 @@
             modalText.innerHTML = '';
             openModal();
 
-            const imagePrompt = `An ultra-realistic, professional photograph of a kitchen remodel in a 16:9 aspect ratio. The style is strictly "${style}". The scene should be well-lit with natural light. The image must look like it belongs in an interior design magazine. Focus on materials, color palette, key features, and overall mood.`;
             const textPrompt = `Act as a creative kitchen designer. Generate an inspiring and descriptive paragraph (about 150 words) for a kitchen remodeling concept with a "${style}" theme. Focus on materials, color palette, key features, and overall mood. Format the response using HTML paragraphs.`;
-
+            
             try {
-                const [imageUrl, textDescription] = await Promise.all([
-                    getAiContent(imagePrompt, 'image'),
-                    getAiContent(textPrompt, 'text')
-                ]);
-
-                modalImage.src = imageUrl;
-                modalImage.classList.remove('hidden');
+                // Step 1: Generate the text description first
+                const textDescription = await getAiContent(textPrompt, 'text');
                 const cleanedDescription = textDescription.replace(/```html|```/g, "").trim();
                 modalText.innerHTML = cleanedDescription;
+
+                // Step 2: Use the generated description to create a more specific image prompt
+                const imagePrompt = `An ultra-realistic, professional photograph of the following kitchen, 16:9 aspect ratio, interior design magazine quality: ${cleanedDescription}`;
+                
+                // Step 3: Generate the image using the new, detailed prompt
+                const imageUrl = await getAiContent(imagePrompt, 'image');
+                modalImage.src = imageUrl;
+                modalImage.classList.remove('hidden');
 
             } catch (error) {
                 console.error("AI generation failed:", error);
