@@ -310,7 +310,7 @@
                     <p class="text-gray-300 mt-2">Contact us today for a free, no-obligation consultation. We proudly serve the entire Tampa Bay area.</p>
                 </div>
                 <div class="max-w-2xl mx-auto">
-                    <form id="contactForm" data-netlify="true" class="bg-white text-gray-800 p-8 rounded-lg shadow-2xl">
+                    <form id="contactForm" name="contact" data-netlify="true" class="bg-white text-gray-800 p-8 rounded-lg shadow-2xl">
                         <div id="form-message" class="hidden mb-4 p-3 rounded-md"></div>
                         <div class="mb-4">
                             <label for="name" class="block text-sm font-bold mb-2">Name <span class="text-red-500">*</span></label>
@@ -553,7 +553,6 @@
             }
         });
 
-
         // --- Image Carousel Logic ---
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
@@ -588,6 +587,26 @@
 
         closePrivacyBtn.addEventListener('click', () => {
             privacyModal.classList.add('hidden');
+        });
+
+        // --- Phone Number Auto-Formatting ---
+        const phoneInput = document.getElementById('phone');
+
+        phoneInput.addEventListener('input', (e) => {
+            let input = e.target.value.replace(/\D/g, '').substring(0, 10); // Remove non-numeric characters
+            let formattedInput = '';
+
+            if (input.length > 0) {
+                formattedInput = '(' + input.substring(0, 3);
+            }
+            if (input.length >= 4) {
+                formattedInput += ') ' + input.substring(3, 6);
+            }
+            if (input.length >= 7) {
+                formattedInput += '-' + input.substring(6, 10);
+            }
+            
+            e.target.value = formattedInput;
         });
     </script>
 
