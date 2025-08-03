@@ -561,7 +561,7 @@
             const originalText = messageTextarea.value;
             messageTextarea.value = "Drafting with AI...";
         
-            const prompt = `Act as a helpful assistant. A potential customer is contacting a kitchen remodeling company. Their project keywords are: "${keywords}". Write a friendly, clear, and concise message (about 3-4 sentences) for them to send. The message should briefly introduce their project and ask for a consultation.`;
+            const prompt = `Act as a helpful assistant. A potential customer is contacting S&R Kitchen Remodeling. Their project keywords are: "${keywords}". Write a friendly, clear, and concise message (about 3-4 sentences) for them to send. The message should briefly introduce their project and ask for a consultation.`;
         
             try {
                 const aiResponse = await getAiContent(prompt, 'text');
