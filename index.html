@@ -445,27 +445,6 @@
             });
         });
         const contactForm = document.getElementById('contactForm');
-        const formMessage = document.getElementById('form-message');
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const message = document.getElementById('message').value;
-            const contactMethod = document.getElementById('contact-method').value;
-            if (name && phone && message && contactMethod) {
-                formMessage.textContent = 'Thank you for your message! We will get back to you soon.';
-                formMessage.className = 'mb-4 p-3 rounded-md bg-green-100 text-green-800';
-                formMessage.classList.remove('hidden');
-                contactForm.reset();
-                setTimeout(() => {
-                    formMessage.classList.add('hidden');
-                }, 5000);
-            } else {
-                formMessage.textContent = 'Please fill out all required fields.';
-                formMessage.className = 'mb-4 p-3 rounded-md bg-red-100 text-red-800';
-                formMessage.classList.remove('hidden');
-            }
-        });
 
         // --- Gemini AI Features ---
         const aiModal = document.getElementById('ai-modal');
